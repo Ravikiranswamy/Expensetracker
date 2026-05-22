@@ -15,7 +15,6 @@
                 <h1>Welcome Back</h1>
                 <p>Sign in to manage your finances</p>
             </div>
-            <div id="login-status-container" style="text-align: center; margin-bottom: 1.25rem;"></div>
             
             <div id="error-message" class="auth-error"></div>
             
@@ -40,68 +39,6 @@
     <script src="js/api.js"></script>
     <script src="js/auth.js"></script>
     <script>
-        // Check API mode and render status banner
-        const isMock = localStorage.getItem('use_mock_api') === 'true' || window.location.hostname.endsWith('github.io');
-        const statusContainer = document.getElementById('login-status-container');
-        if (statusContainer) {
-            if (isMock) {
-                statusContainer.innerHTML = `
-                    <div class="auth-status-banner demo" style="cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; background: var(--primary-light); color: var(--primary); padding: 0.35rem 0.75rem; border-radius: 50px; font-size: 0.8rem; font-weight: 500; border: 1px solid rgba(59, 130, 246, 0.2);" title="Click to switch to Local Server mode">
-                        <span style="width: 8px; height: 8px; border-radius: 50%; background-color: var(--primary); display: inline-block; animation: pulse 2s infinite;"></span>
-                        <span>Demo Mode (Local Offline Storage)</span>
-                    </div>
-                    <div style="margin-top: 0.5rem; font-size: 0.75rem; color: var(--text-secondary);">
-                        Use guest email <strong style="color: var(--primary); cursor: pointer; text-decoration: underline;" id="quick-demo-login">demo@example.com</strong> (password: password) for instant access.
-                    </div>
-                `;
-                
-                const styleSheet = document.createElement("style");
-                styleSheet.innerText = `
-                    @keyframes pulse {
-                        0% { transform: scale(0.95); opacity: 0.8; }
-                        50% { transform: scale(1.15); opacity: 1; }
-                        100% { transform: scale(0.95); opacity: 0.8; }
-                    }
-                `;
-                document.head.appendChild(styleSheet);
-                
-                document.getElementById('quick-demo-login').addEventListener('click', () => {
-                    document.getElementById('email').value = 'demo@example.com';
-                    document.getElementById('password').value = 'password';
-                    document.getElementById('login-form').dispatchEvent(new Event('submit'));
-                });
-                
-                statusContainer.querySelector('.auth-status-banner').addEventListener('click', () => {
-                    if (window.location.hostname.endsWith('github.io')) {
-                        alert('You are running on GitHub Pages (static cloud hosting). Connecting to a local server requires running the Spring Boot backend locally at http://localhost:8080.');
-                    }
-                    if (confirm('Switch to Local Server mode? This requires your Spring Boot backend to be running locally at http://localhost:8080/api.')) {
-                        localStorage.removeItem('use_mock_api');
-                        window.location.reload();
-                    }
-                });
-            } else {
-                statusContainer.innerHTML = `
-                    <div class="auth-status-banner server" style="cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(16, 185, 129, 0.08); color: var(--success); padding: 0.35rem 0.75rem; border-radius: 50px; font-size: 0.8rem; font-weight: 500; border: 1px solid rgba(16, 185, 129, 0.2);" title="Click to switch to Demo Mode">
-                        <span style="width: 8px; height: 8px; border-radius: 50%; background-color: var(--success); display: inline-block;"></span>
-                        <span>Local Server Mode</span>
-                    </div>
-                    <div style="margin-top: 0.5rem; font-size: 0.75rem; color: var(--text-secondary);">
-                        Want to try the online demo? <span style="text-decoration: underline; color: var(--primary); cursor: pointer;" id="switch-to-demo-link">Switch to Demo Mode</span>
-                    </div>
-                `;
-                
-                document.getElementById('switch-to-demo-link').addEventListener('click', () => {
-                    localStorage.setItem('use_mock_api', 'true');
-                    window.location.reload();
-                });
-                
-                statusContainer.querySelector('.auth-status-banner').addEventListener('click', () => {
-                    localStorage.setItem('use_mock_api', 'true');
-                    window.location.reload();
-                });
-            }
-        }
 
         // Check if already authenticated
         checkAuth();

@@ -82,7 +82,6 @@ function initLayout(activePage) {
                     <div class="logo-icon">ET</div>
                     <div class="logo-brand">
                         <div class="logo-text">ExpenseTracker</div>
-                        <div class="status-badge" id="api-status-badge">Checking...</div>
                     </div>
                 </div>
                 <ul class="nav-links">
@@ -140,7 +139,6 @@ function initLayout(activePage) {
         </button>
         <div class="logo-brand" style="flex-grow: 1; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; padding-left: 0.5rem;">
             <div class="logo-text" style="font-size: 1.1rem; line-height: 1.1;">ExpenseTracker</div>
-            <div class="status-badge" id="mobile-api-status-badge" style="font-size: 0.65rem; margin-top: 0.15rem; padding: 0.05rem 0.35rem;">Checking...</div>
         </div>
         <div class="user-avatar" style="width: 2rem; height: 2rem; font-size: 0.8rem;">${user.name.charAt(0)}</div>
     `;
@@ -169,51 +167,6 @@ function initLayout(activePage) {
     // Initialize theme state and toggler globally
     initTheme();
 
-    // Update status badge values
-    updateStatusBadge();
-}
-
-// Interactive Status Badge Management
-function updateStatusBadge() {
-    const isMock = localStorage.getItem('use_mock_api') === 'true' || window.location.hostname.endsWith('github.io');
-    const badges = [
-        document.getElementById('api-status-badge'),
-        document.getElementById('mobile-api-status-badge')
-    ];
-    
-    badges.forEach(badge => {
-        if (!badge) return;
-        
-        if (isMock) {
-            badge.innerText = 'Demo Mode';
-            badge.className = 'status-badge demo';
-            badge.title = 'Click to switch to Local Server mode';
-        } else {
-            badge.innerText = 'Local Server';
-            badge.className = 'status-badge server';
-            badge.title = 'Click to switch to Demo Mode';
-        }
-        
-        badge.addEventListener('click', (e) => {
-            e.stopPropagation();
-            if (isMock) {
-                if (window.location.hostname.endsWith('github.io')) {
-                    alert('You are running on GitHub Pages (static cloud hosting). Connecting to a local server requires running the Spring Boot backend locally at http://localhost:8080.');
-                }
-                if (confirm('Switch to Local Server mode? This requires your Spring Boot backend to be running locally at http://localhost:8080/api.')) {
-                    localStorage.removeItem('use_mock_api');
-                    showToast('Switched to Local Server mode. Reloading...', 'success');
-                    setTimeout(() => window.location.reload(), 1000);
-                }
-            } else {
-                if (confirm('Switch to offline Demo Mode? All transactions will be stored locally in your browser.')) {
-                    localStorage.setItem('use_mock_api', 'true');
-                    showToast('Switched to Demo Mode. Reloading...', 'success');
-                    setTimeout(() => window.location.reload(), 1000);
-                }
-            }
-        });
-    });
 }
 
 // Global Theme Management

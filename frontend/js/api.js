@@ -6,6 +6,21 @@ const API_BASE_URL = 'http://localhost:8080/api';
 let useMock = localStorage.getItem('use_mock_api') === 'true' || 
               window.location.hostname.endsWith('github.io');
 
+// Wiping any old pre-seeded mock database files to ensure starting fresh at 0
+if (localStorage.getItem('mock_db_version') !== 'v5') {
+    const keysToRemove = [];
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && (key.startsWith('mock_') || key === 'use_mock_api')) {
+            keysToRemove.push(key);
+        }
+    }
+    keysToRemove.forEach(key => localStorage.removeItem(key));
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    localStorage.setItem('mock_db_version', 'v5');
+}
+
 // Mock Client-Side Database Orchestration
 const MOCK_DB = {
     getUsers() {
@@ -32,37 +47,7 @@ const MOCK_DB = {
 
 // Seed initial mock data for demo users
 function seedMockData(userId) {
-    const expensesKey = `mock_expenses_${userId}`;
-    const incomeKey = `mock_income_${userId}`;
-    
-    if (!localStorage.getItem(expensesKey)) {
-        const today = new Date();
-        const yyyy = today.getFullYear();
-        const mm = String(today.getMonth() + 1).padStart(2, '0');
-        
-        const initialExpenses = [
-            { id: 1, userId, amount: 12500, category: 'Bills', description: 'Monthly Apartment Rent', date: `${yyyy}-${mm}-01`, paymentMethod: 'Bank Transfer' },
-            { id: 2, userId, amount: 3200, category: 'Food', description: 'Supermarket Groceries', date: `${yyyy}-${mm}-04`, paymentMethod: 'Debit Card' },
-            { id: 3, userId, amount: 2400, category: 'Bills', description: 'Electricity & Wi-Fi bills', date: `${yyyy}-${mm}-08`, paymentMethod: 'Mobile Wallet' },
-            { id: 4, userId, amount: 1200, category: 'Travel', description: 'Fuel Refill', date: `${yyyy}-${mm}-10`, paymentMethod: 'Credit Card' },
-            { id: 5, userId, amount: 1850, category: 'Entertainment', description: 'Dinner & Movie with friends', date: `${yyyy}-${mm}-14`, paymentMethod: 'Cash' },
-            { id: 6, userId, amount: 950, category: 'Health', description: 'Pharmacy prescriptions', date: `${yyyy}-${mm}-18`, paymentMethod: 'Mobile Wallet' },
-            { id: 7, userId, amount: 1500, category: 'Shopping', description: 'New clothes purchase', date: `${yyyy}-${mm}-20`, paymentMethod: 'Credit Card' }
-        ];
-        localStorage.setItem(expensesKey, JSON.stringify(initialExpenses));
-    }
-    
-    if (!localStorage.getItem(incomeKey)) {
-        const today = new Date();
-        const yyyy = today.getFullYear();
-        const mm = String(today.getMonth() + 1).padStart(2, '0');
-        
-        const initialIncome = [
-            { id: 1, userId, amount: 50000, source: 'Salary', description: 'Monthly Payroll Transfer', date: `${yyyy}-${mm}-01` },
-            { id: 2, userId, amount: 15000, source: 'Freelance', description: 'UI/UX Design Contract Work', date: `${yyyy}-${mm}-15` }
-        ];
-        localStorage.setItem(incomeKey, JSON.stringify(initialIncome));
-    }
+    // Starting fresh at 0
 }
 
 // Local Session Mock handlers
@@ -70,36 +55,19 @@ function mockLogin(email, password) {
     let users = MOCK_DB.getUsers();
     let user = users.find(u => u.email === email);
     
-    // Seed default guest user if it doesn't exist
-    if (!user && email === 'demo@example.com') {
-        user = {
-            id: 999,
-            name: 'Demo Guest',
-            email: 'demo@example.com',
-            password: 'password',
-            monthlyBudget: 25000
-        };
-        users.push(user);
-        MOCK_DB.saveUsers(users);
-    }
-    
-    // Auto-create user on the fly if running in Demo Mode for a smoother experience
+    // Auto-create user on the fly if running in client-side fallback mode
     if (!user) {
         user = {
             id: Date.now(),
             name: email.split('@')[0].toUpperCase(),
             email: email,
             password: password,
-            monthlyBudget: 20000
+            monthlyBudget: 0
         };
         users.push(user);
         MOCK_DB.saveUsers(users);
     } else if (user.password !== password) {
-        throw new Error('Invalid email or password in Demo Mode');
-    }
-    
-    if (user.id === 999) {
-        seedMockData(user.id);
+        throw new Error('Invalid email or password');
     }
     
     return {
@@ -114,7 +82,7 @@ function mockLogin(email, password) {
 function mockRegister(name, email, password) {
     let users = MOCK_DB.getUsers();
     if (users.some(u => u.email === email)) {
-        throw new Error('Email already registered in Demo Mode');
+        throw new Error('Email already registered');
     }
     
     const user = {
@@ -126,10 +94,6 @@ function mockRegister(name, email, password) {
     };
     users.push(user);
     MOCK_DB.saveUsers(users);
-    
-    if (user.id === 999) {
-        seedMockData(user.id);
-    }
     
     return {
         token: 'mock-jwt-token-for-user-' + user.id,
@@ -418,12 +382,12 @@ const api = {
                                    error.message.includes('fetch');
                                    
             if (isNetworkError && !useMock) {
-                console.warn("Backend server offline. Switching to client-side Demo Mode.");
+                console.warn("Backend server offline. Switching to client-side database.");
                 useMock = true;
                 localStorage.setItem('use_mock_api', 'true');
                 
                 if (typeof showToast === 'function') {
-                    showToast('Backend offline. Switched to Demo Mode.', 'info');
+                    showToast('Backend offline. Switched to offline database.', 'info');
                 }
                 
                 // Retry request using Mock Mode
