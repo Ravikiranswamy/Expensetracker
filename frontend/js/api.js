@@ -98,7 +98,9 @@ function mockLogin(email, password) {
         throw new Error('Invalid email or password in Demo Mode');
     }
     
-    seedMockData(user.id);
+    if (user.id === 999) {
+        seedMockData(user.id);
+    }
     
     return {
         token: 'mock-jwt-token-for-user-' + user.id,
@@ -125,7 +127,9 @@ function mockRegister(name, email, password) {
     users.push(user);
     MOCK_DB.saveUsers(users);
     
-    seedMockData(user.id);
+    if (user.id === 999) {
+        seedMockData(user.id);
+    }
     
     return {
         token: 'mock-jwt-token-for-user-' + user.id,
