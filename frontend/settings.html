@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - Expense Tracker</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Dynamic Sidebar Container -->
+        <div id="sidebar-container"></div>
+        
+        <!-- Main Panel -->
+        <main class="main-content">
+            <header class="header-bar">
+                <div class="welcome-section">
+                    <h1>Profile & Settings</h1>
+                    <p>Configure your personal finance parameters and budgets</p>
+                </div>
+                <div class="header-actions">
+                    <button class="theme-toggle-btn" id="dark-theme-toggle" title="Toggle Theme">
+                        <svg style="width: 1.25rem; height: 1.25rem;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Settings Grid -->
+            <div style="display: flex; flex-direction: column; gap: 1.5rem; max-width: 600px;">
+                <!-- Profile Card -->
+                <section class="card">
+                    <h2 style="font-size: 1.125rem; font-weight: 600; margin-bottom: 1.25rem;">Account Information</h2>
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="settings-name" class="form-control" readonly style="background-color: var(--background); cursor: not-allowed; opacity: 0.8;">
+                    </div>
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" id="settings-email" class="form-control" readonly style="background-color: var(--background); cursor: not-allowed; opacity: 0.8;">
+                    </div>
+                </section>
+
+                <!-- Monthly Budget Card -->
+                <section class="card">
+                    <h2 style="font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem;">Budget Configuration</h2>
+                    <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
+                        Set a monthly spending limit. We will calculate your remaining budget and alert you if you overspend.
+                    </p>
+                    
+                    <form id="budget-form">
+                        <div class="form-group">
+                            <label for="settings-budget">Monthly Budget Limit (₹)</label>
+                            <input type="number" step="0.01" min="0" id="settings-budget" class="form-control" placeholder="0.00" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="margin-top: 0.5rem;">Save Configuration</button>
+                    </form>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/settings.js"></script>
+</body>
+</html>

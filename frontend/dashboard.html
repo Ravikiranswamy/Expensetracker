@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Expense Tracker</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Dynamic Sidebar Container -->
+        <div id="sidebar-container"></div>
+        
+        <!-- Main Panel -->
+        <main class="main-content">
+            <header class="header-bar">
+                <div class="welcome-section">
+                    <h1 id="welcome-username">Hello, User</h1>
+                    <p id="current-date">Today is Friday, May 22, 2026</p>
+                </div>
+                <div class="header-actions">
+                    <button class="theme-toggle-btn" id="dark-theme-toggle" title="Toggle Theme">
+                        <!-- Dark mode Moon icon (SVG) -->
+                        <svg style="width: 1.25rem; height: 1.25rem;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Budget Alert Banner (Dynamically shown) -->
+            <div id="budget-warning-banner" class="budget-alert-banner danger" style="display: none;">
+                <svg style="width: 1.25rem; height: 1.25rem; flex-shrink: 0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                <span id="budget-warning-text">Warning: You have exceeded your monthly spending limit!</span>
+            </div>
+
+            <!-- Overview Grid -->
+            <section class="dashboard-grid">
+                <!-- Total Income Card -->
+                <div class="card stat-card">
+                    <div class="stat-header">
+                        <span>Total Income</span>
+                        <div class="stat-icon income">
+                            <svg style="width: 1.25rem; height: 1.25rem;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+                        </div>
+                    </div>
+                    <div class="stat-value" id="total-income">₹0.00</div>
+                </div>
+
+                <!-- Total Expenses Card -->
+                <div class="card stat-card">
+                    <div class="stat-header">
+                        <span>Total Expenses</span>
+                        <div class="stat-icon expense">
+                            <svg style="width: 1.25rem; height: 1.25rem;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>
+                        </div>
+                    </div>
+                    <div class="stat-value" id="total-expenses">₹0.00</div>
+                </div>
+
+                <!-- Balance Card -->
+                <div class="card stat-card">
+                    <div class="stat-header">
+                        <span>Remaining Balance</span>
+                        <div class="stat-icon balance">
+                            <svg style="width: 1.25rem; height: 1.25rem;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="12" y1="4" x2="12" y2="20"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
+                        </div>
+                    </div>
+                    <div class="stat-value" id="remaining-balance">₹0.00</div>
+                </div>
+
+                <!-- Monthly Budget Card -->
+                <div class="card stat-card">
+                    <div class="stat-header">
+                        <span>Monthly Budget</span>
+                        <div class="stat-icon budget">
+                            <svg style="width: 1.25rem; height: 1.25rem;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        </div>
+                    </div>
+                    <div class="stat-value" id="monthly-budget">₹0.00</div>
+                    <div class="budget-progress-container">
+                        <div class="budget-progress-bar">
+                            <div id="budget-progress-fill" class="budget-progress-fill" style="width: 0%;"></div>
+                        </div>
+                        <div class="budget-helper-text" id="budget-helper-text">No limit configured</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- AI Financial Suggestions Card -->
+            <div class="card" style="display: flex; align-items: flex-start; gap: 1rem; background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(16, 185, 129, 0.08)); border: 1px solid rgba(59, 130, 246, 0.15);">
+                <div style="font-size: 1.5rem; line-height: 1; padding: 0.5rem; background-color: var(--surface); border-radius: var(--radius-md); box-shadow: var(--shadow-sm);">💡</div>
+                <div style="flex-grow: 1;">
+                    <h3 style="font-size: 0.95rem; font-weight: 600; color: var(--text-primary);">AI Financial Insights</h3>
+                    <p id="ai-suggestion-text" style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.25rem; line-height: 1.45;">
+                        Analyzing your financial transactions...
+                    </p>
+                </div>
+            </div>
+
+            <!-- Bottom Section: Recent Transactions & Chart -->
+            <section class="dashboard-details-grid">
+                <div class="card table-card">
+                    <div class="card-title-bar">
+                        <h2>Recent Transactions</h2>
+                        <a href="expenses.html" class="btn btn-secondary btn-sm">Manage</a>
+                    </div>
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Description</th>
+                                    <th>Category/Source</th>
+                                    <th>Type</th>
+                                    <th>Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recent-transactions-body">
+                                <tr>
+                                    <td colspan="5" style="text-align: center; color: var(--text-secondary); padding: 2rem;">
+                                        Loading recent transactions...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card table-card">
+                    <div class="card-title-bar">
+                        <h2>Expense Categories</h2>
+                    </div>
+                    <div style="position: relative; height: 260px; display: flex; align-items: center; justify-content: center; margin-top: 0.5rem; width: 100%;">
+                        <canvas id="category-chart" style="max-height: 250px; max-width: 250px;"></canvas>
+                        <div id="no-chart-data" style="position: absolute; display: none; color: var(--text-secondary); font-size: 0.875rem;">
+                            No expense data to display
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>
